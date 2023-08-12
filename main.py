@@ -98,7 +98,7 @@ hoja_excel.merge_cells('A1:B1')
 
 # Llenar la hoja de cálculo con las soluciones y sus valores
 for indice, solucion in enumerate(soluciones):
-    fila = indice + 3  # Empezar desde la fila 2, ya que la primera fila contiene encabezados
+    fila = indice + 3  # Empezar desde la fila 3, ya que la primera fila contiene encabezados
     hoja_excel[f'A{fila}'] = str(solucion["solucion"])
     ponerBorde(hoja_excel[f'A{fila}'], bordeDelgado)
     alinearCelda(hoja_excel[f'A{fila}'])
