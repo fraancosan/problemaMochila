@@ -5,20 +5,32 @@ from openpyxl.styles import Font, Alignment, Side, Border
 
 # Un objeto con un peso (int) en gramos y un valor (int)
 class Objeto:
+    # Instrucciones que pasaran al crearse los objetos
     def __init__(self, volumen: int= 0,peso: int = 0, valor: int = 0) -> None:
+        # Mas alla de si el ejercicio usara un peso o volumen
+        # se establecen los atributos de todas formas
+        # si el ejercicio funciona mediante peso, entonces su volumen sera 0
+        # de forma analoga sucedera lo mismo si el ejercicio funciona con volumen
         self.peso = peso
         self.volumen = volumen
         self.valor = valor
+
+        # Segun se use peso o volumen, se cambiara 
+        # la forma de calcular su indice
+
         if self.volumen !=0:
             self.indice = round(valor / volumen, 4)
         else:
             self.indice = round(valor / peso, 4)
 
+    # Al querer imprimir al objeto, se enviaran los siguientes mensajes
+    # Se utiliza principalmente para pruebas internas
     def __repr__(self) -> str:
+        # Segun se utilice volumen o peso el mensaje sera distinto
         if self.volumen !=0:
             return f"\nVolumen: {self.volumen} - Valor: {self.valor} - Indice: {self.indice}"
         else:
-            return f"\nPeso: {self.peso} - Valor: {self.valor}"
+            return f"\nPeso: {self.peso} - Valor: {self.valor}  - Indice: {self.indice}"
 
 
 # Esta funcion tiene la tarea de devolver un booleano que simbolice
