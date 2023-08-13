@@ -171,6 +171,15 @@ else:
         ponerBorde(hoja_excel[f'D{fila}'], bordeDelgado)
         alinearCelda(hoja_excel[f'D{fila}'])
 
+    
+    hoja_excel[f'A{(len(soluciones[0])+3)}'] = f"Valor Total: {soluciones[1]}"
+    ponerBorde(hoja_excel[f'A{(len(soluciones[0])+3)}'], bordeDelgado)
+    alinearCelda(hoja_excel[f'A{(len(soluciones[0])+3)}'])
+    hoja_excel[f'A{(len(soluciones[0])+3)}'].font = Font(bold=True)
+
+    hoja_excel.merge_cells(f'A{(len(soluciones[0])+3)}:D{(len(soluciones[0])+3)}')
+
+
 # Guardar el libro de Excel en el directorio de resultados
 nombre_archivo_excel = f"Soluciones Mochila Paso {paso}.xlsx"
 ruta_archivo_excel = os.path.join(directorio_resultados, nombre_archivo_excel)
