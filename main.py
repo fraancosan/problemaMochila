@@ -13,9 +13,9 @@ if not os.path.exists(directorio_resultados):
     os.makedirs(directorio_resultados)
 
 
-paso = input("¿Que punto desea realizar?\n1. Exhaustivo\n2. Heuristica\n3. Exhaustivo\n4. Heuristica\n")
+paso = input("¿Que punto desea realizar?\n1. Exhaustivo\n2. Heuristica\n3. Exhaustivo\n4. Heuristica\n\n")
 while (paso != "1" and paso != "2" and paso != "3" and paso != "4"):
-    paso = input("¿Que punto desea realizar?\n1. Exhaustivo\n2. Heuristica\n3. Exhaustivo\n4. Heuristica\n")
+    paso = input("¿Que punto desea realizar?\n1. Exhaustivo\n2. Heuristica\n3. Exhaustivo\n4. Heuristica\n\n")
 
 if (paso == "1" or paso == "2"):
     objetos: list = [
@@ -81,7 +81,7 @@ hoja_excel.title = f"Soluciones de la Mochila"
 
 bordeDelgado = Side(border_style="thin", color="000000")
 
-
+# Instrucciones generales para todos los pasos
 # Encabezados
 hoja_excel['A1'] = f"Paso {paso}"
 hoja_excel['A1'].font = Font(bold=True)
@@ -107,15 +107,31 @@ if paso == "1" or paso == "3":
     hoja_excel['B2'] = "Valor total"
 
     hoja_excel.merge_cells('A1:B1')
+
     # Llenar la hoja de cálculo con las soluciones y sus valores
     for indice, solucion in enumerate(soluciones):
         fila = indice + 3  # Empezar desde la fila 3, ya que la primera fila contiene encabezados
         
-        hoja_excel[f'A{fila}'] = str(solucion["solucion"])
+        #En esta variable guardo objetos almacenados
+        objetosMochila = []
+
+        for i in range(len(solucion["solucion"])):
+            if solucion["solucion"][i]:
+                objetosMochila.append(str(i + 1))
+
+        # Segun haya un objeto almacenado, muchos o ninguno
+        # muestro en el excel el mensaje correspondiente
+        if len(objetosMochila) == 0:
+            hoja_excel[f'A{fila}'] = "No se almacenan objetos"
+        elif len(objetosMochila) == 1:
+            hoja_excel[f'A{fila}'] = "Se almacena el objeto: " + "".join(objetosMochila)
+        else:
+            hoja_excel[f'A{fila}'] = "Se almacenan los objetos: " + ", ".join(objetosMochila)
+
         hoja_excel[f'B{fila}'] = solucion["total"]
 
         ponerBorde(hoja_excel[f'A{fila}'], bordeDelgado)
-        alinearCelda(hoja_excel[f'A{fila}'])
+        #alinearCelda(hoja_excel[f'A{fila}'])
 
         ponerBorde(hoja_excel[f'B{fila}'], bordeDelgado)
         alinearCelda(hoja_excel[f'B{fila}'])
@@ -128,6 +144,7 @@ else:
     hoja_excel.column_dimensions["C"].width = 15
 
     # Encabezados
+    # Segun lo que pida el ejercicio muestro los datos correspondientes
     if paso == "2":
         hoja_excel['A2'] = "Volumen"
     else:
@@ -138,6 +155,8 @@ else:
     hoja_excel['D2'] = "Objeto"
 
     hoja_excel.merge_cells('A1:D1')
+
+    #Pongo formato a las celdas
 
     hoja_excel['C2'].font = Font(bold=True)
     alinearCelda(hoja_excel['C2'])
@@ -150,6 +169,8 @@ else:
     # Llenar la hoja de cálculo con las soluciones y sus valores
     for indice, solucion in enumerate(soluciones[0]):
         fila = indice + 3  # Empezar desde la fila 3, ya que la primera fila contiene encabezados
+
+        #Segun lo que pide el ejercicio muestro el dato correspondiente
         if paso == "2":
             hoja_excel[f'A{fila}'] = solucion.volumen
         else:
@@ -157,6 +178,8 @@ else:
 
         hoja_excel[f'B{fila}'] = solucion.valor
         hoja_excel[f'C{fila}'] = solucion.indice
+
+        #Pongo cual es el numero del objeto, para poderlo identificar
         hoja_excel[f'D{fila}'] = copiaObjetos.index(solucion) + 1
 
         ponerBorde(hoja_excel[f'A{fila}'], bordeDelgado)
@@ -171,8 +194,9 @@ else:
         ponerBorde(hoja_excel[f'D{fila}'], bordeDelgado)
         alinearCelda(hoja_excel[f'D{fila}'])
 
-    
+    # Añado el valor total de la solucion debajo de todo
     hoja_excel[f'A{(len(soluciones[0])+3)}'] = f"Valor Total: {soluciones[1]}"
+    # Le pongo formato
     ponerBorde(hoja_excel[f'A{(len(soluciones[0])+3)}'], bordeDelgado)
     alinearCelda(hoja_excel[f'A{(len(soluciones[0])+3)}'])
     hoja_excel[f'A{(len(soluciones[0])+3)}'].font = Font(bold=True)
@@ -185,4 +209,4 @@ nombre_archivo_excel = f"Soluciones Mochila Paso {paso}.xlsx"
 ruta_archivo_excel = os.path.join(directorio_resultados, nombre_archivo_excel)
 libro_excel.save(ruta_archivo_excel)
 
-print(f"Se han guardado las soluciones en '{ruta_archivo_excel}'")
+print(f"\nSe han guardado las soluciones en '{ruta_archivo_excel}'")
