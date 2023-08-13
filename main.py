@@ -13,9 +13,9 @@ if not os.path.exists(directorio_resultados):
     os.makedirs(directorio_resultados)
 
 
-paso = input("¿Desea realizar el punto 1, 2 o 3?\n")
-while (paso != "1" and paso != "2" and paso != "3"):
-    utilizaElitismo = input("¿Desea realizar el punto 1, 2 o 3?\n")
+paso = input("¿Que punto desea realizar?\n1. Exhaustivo\n2. Heuristica\n3. Exhaustivo\n4. Heuristica\n")
+while (paso != "1" and paso != "2" and paso != "3" and paso != "4"):
+    paso = input("¿Que punto desea realizar?\n1. Exhaustivo\n2. Heuristica\n3. Exhaustivo\n4. Heuristica\n")
 
 if (paso == "1" or paso == "2"):
     objetos: list = [
@@ -33,7 +33,7 @@ if (paso == "1" or paso == "2"):
     # Capacidad o volumen maximo soportado por la mochila, dato dado por el enunciado
     capacidad = 4200
 
-elif paso == "3":
+if paso == "3" or paso == "4":
     # Datos de los objetos dados por el enunciado
     objetos: list = [
         Objeto(0, 1800, 72),
@@ -43,25 +43,33 @@ elif paso == "3":
     # Capacidad maxima soportada por la mochila, dato dado por el enunciado
     capacidad = 3000
 
-# Lista de la solucion, cada posicion de esta lista coincide con la posicion del objeto en la lista objetos
-# En una etapa inicial o intermedia todos o algunos de los elementos de la lista seran None (incertidumbre)
-# Si meto un objeto a la mochila se simboliza con un True si no lo guardo se simboliza con un False
-# Por ejemplo si mi lista solucion es [False, False, True, True, False, False, False, False, True, True] 
-# significa que guarde en mi mochila los objetos objetos[2], objetos[3], objetos[8] y objetos[9]
-solucion = [None for i in range(len(objetos))]
+# Dado que luego el orden de los objetos se altera, 
+# necesito una copia para poder operar sobre el orden original mas adelante
+copiaObjetos = objetos.copy()
 
 
+if paso == "1" or paso == "3":
+    # Lista de la solucion, cada posicion de esta lista coincide con la posicion del objeto en la lista objetos
+    # En una etapa inicial o intermedia todos o algunos de los elementos de la lista seran None (incertidumbre)
+    # Si meto un objeto a la mochila se simboliza con un True si no lo guardo se simboliza con un False
+    # Por ejemplo si mi lista solucion es [False, False, True, True, False, False, False, False, True, True] 
+    # significa que guarde en mi mochila los objetos objetos[2], objetos[3], objetos[8] y objetos[9]
+    solucion = [None for i in range(len(objetos))]
 
-# En esta lista se guardaran todas las soluciones finales validas al problema
-# Esta lista es sometida a un ordenamiento para ordenar de la mejor a la peor
-# solucion segun el valor total de los objetos guardados en la mochila
-#Si no se aplican restricciones habria 2^n soluciones, siendo "n" la cantidad de objetos disponibles
-#El numero decrece mucho si se aplican restricciones
-soluciones = []
+
+    # En esta lista se guardaran todas las soluciones finales validas al problema
+    # Esta lista es sometida a un ordenamiento para ordenar de la mejor a la peor
+    # solucion segun el valor total de los objetos guardados en la mochila
+    #Si no se aplican restricciones habria 2^n soluciones, siendo "n" la cantidad de objetos disponibles
+    #El numero decrece mucho si se aplican restricciones
+    soluciones = []
 
 
-buscarSolucion(solucion, objetos, capacidad, soluciones)
-ordenarSoluciones(soluciones, objetos)
+    buscarSolucion(solucion, objetos, capacidad, soluciones)
+    ordenarSoluciones(soluciones, objetos)
+
+else:
+    soluciones = buscarSolucionHeu(objetos, capacidad)
 
 
 # Guardado de archivo xls
@@ -73,9 +81,6 @@ hoja_excel.title = f"Soluciones de la Mochila"
 
 bordeDelgado = Side(border_style="thin", color="000000")
 
-#Tamaño columnas
-hoja_excel.column_dimensions["A"].width = 55
-hoja_excel.column_dimensions["B"].width = 15
 
 # Encabezados
 hoja_excel['A1'] = f"Paso {paso}"
@@ -83,33 +88,91 @@ hoja_excel['A1'].font = Font(bold=True)
 alinearCelda(hoja_excel['A1'])
 ponerBorde(hoja_excel['A1'], bordeDelgado)
 
-hoja_excel['A2'] = "Solución"
 hoja_excel['A2'].font = Font(bold=True)
 alinearCelda(hoja_excel['A2'])
 ponerBorde(hoja_excel['A2'], bordeDelgado)
 
-hoja_excel['B2'] = "Valor total"
 hoja_excel['B2'].font = Font(bold=True)
 alinearCelda(hoja_excel['B2'])
 ponerBorde(hoja_excel['B2'], bordeDelgado)
 
-hoja_excel.merge_cells('A1:B1')
+#Exclusivo paso 1 y 3
+if paso == "1" or paso == "3":
+    # Tamaño columnas
+    hoja_excel.column_dimensions["A"].width = 55
+    hoja_excel.column_dimensions["B"].width = 15
 
+    # Encabezados
+    hoja_excel['A2'] = "Solución"
+    hoja_excel['B2'] = "Valor total"
 
-# Llenar la hoja de cálculo con las soluciones y sus valores
-for indice, solucion in enumerate(soluciones):
-    fila = indice + 3  # Empezar desde la fila 3, ya que la primera fila contiene encabezados
-    hoja_excel[f'A{fila}'] = str(solucion["solucion"])
-    ponerBorde(hoja_excel[f'A{fila}'], bordeDelgado)
-    alinearCelda(hoja_excel[f'A{fila}'])
-    
-    hoja_excel[f'B{fila}'] = solucion["total"]
-    ponerBorde(hoja_excel[f'B{fila}'], bordeDelgado)
-    alinearCelda(hoja_excel[f'B{fila}'])
+    hoja_excel.merge_cells('A1:B1')
+    # Llenar la hoja de cálculo con las soluciones y sus valores
+    for indice, solucion in enumerate(soluciones):
+        fila = indice + 3  # Empezar desde la fila 3, ya que la primera fila contiene encabezados
+        
+        hoja_excel[f'A{fila}'] = str(solucion["solucion"])
+        hoja_excel[f'B{fila}'] = solucion["total"]
 
+        ponerBorde(hoja_excel[f'A{fila}'], bordeDelgado)
+        alinearCelda(hoja_excel[f'A{fila}'])
+
+        ponerBorde(hoja_excel[f'B{fila}'], bordeDelgado)
+        alinearCelda(hoja_excel[f'B{fila}'])
+
+#Exclusivo paso 2 y 4
+else:
+    # Tamaño columnas
+    hoja_excel.column_dimensions["A"].width = 15
+    hoja_excel.column_dimensions["B"].width = 15
+    hoja_excel.column_dimensions["C"].width = 15
+
+    # Encabezados
+    if paso == "2":
+        hoja_excel['A2'] = "Volumen"
+    else:
+        hoja_excel['A2'] = "Peso"
+
+    hoja_excel['B2'] = "Valor"
+    hoja_excel['C2'] = "Indice"
+    hoja_excel['D2'] = "Objeto"
+
+    hoja_excel.merge_cells('A1:D1')
+
+    hoja_excel['C2'].font = Font(bold=True)
+    alinearCelda(hoja_excel['C2'])
+    ponerBorde(hoja_excel['C2'], bordeDelgado)
+
+    hoja_excel['D2'].font = Font(bold=True)
+    alinearCelda(hoja_excel['D2'])
+    ponerBorde(hoja_excel['D2'], bordeDelgado)
+
+    # Llenar la hoja de cálculo con las soluciones y sus valores
+    for indice, solucion in enumerate(soluciones[0]):
+        fila = indice + 3  # Empezar desde la fila 3, ya que la primera fila contiene encabezados
+        if paso == "2":
+            hoja_excel[f'A{fila}'] = solucion.volumen
+        else:
+            hoja_excel[f'A{fila}'] = solucion.peso
+
+        hoja_excel[f'B{fila}'] = solucion.valor
+        hoja_excel[f'C{fila}'] = solucion.indice
+        hoja_excel[f'D{fila}'] = copiaObjetos.index(solucion) + 1
+
+        ponerBorde(hoja_excel[f'A{fila}'], bordeDelgado)
+        alinearCelda(hoja_excel[f'A{fila}'])
+
+        ponerBorde(hoja_excel[f'B{fila}'], bordeDelgado)
+        alinearCelda(hoja_excel[f'B{fila}'])
+
+        ponerBorde(hoja_excel[f'C{fila}'], bordeDelgado)
+        alinearCelda(hoja_excel[f'C{fila}'])
+
+        ponerBorde(hoja_excel[f'D{fila}'], bordeDelgado)
+        alinearCelda(hoja_excel[f'D{fila}'])
 
 # Guardar el libro de Excel en el directorio de resultados
-nombre_archivo_excel = f"soluciones Mochila Paso {paso}.xlsx"
+nombre_archivo_excel = f"Soluciones Mochila Paso {paso}.xlsx"
 ruta_archivo_excel = os.path.join(directorio_resultados, nombre_archivo_excel)
 libro_excel.save(ruta_archivo_excel)
 

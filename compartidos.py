@@ -1,13 +1,24 @@
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, Side, Border
 
+########################## Funciones mas que nada para metodo exhaustivo ##########################
+
 # Un objeto con un peso (int) en gramos y un valor (int)
 class Objeto:
-
     def __init__(self, volumen: int= 0,peso: int = 0, valor: int = 0) -> None:
         self.peso = peso
         self.volumen = volumen
         self.valor = valor
+        if self.volumen !=0:
+            self.indice = round(valor / volumen, 4)
+        else:
+            self.indice = round(valor / peso, 4)
+
+    def __repr__(self) -> str:
+        if self.volumen !=0:
+            return f"\nVolumen: {self.volumen} - Valor: {self.valor} - Indice: {self.indice}"
+        else:
+            return f"\nPeso: {self.peso} - Valor: {self.valor}"
 
 
 # Esta funcion tiene la tarea de devolver un booleano que simbolice
@@ -102,6 +113,55 @@ def buscarSolucion(solucion: list, objetos: list, capacidad, soluciones, etapa: 
         
     solucion[etapa] = None
 
+
+########################## Funciones sobre metodo heuristico ##########################
+
+def ordenarObjHeu(objetos):
+    # Ordena la lista de objetos segun su indice
+    # el argumento 'key' simboliza segun que
+    # valor se ordenaran los elementos
+    objetos.sort(key=lambda x: x.indice, reverse=True)
+
+
+# Devuelve el valor total de una mochila, realizando una
+# sumatoria sobre los valores de todos los objetos guardados en la misma 
+def obtenerTotalHeu(mochila) -> int:
+    total = 0
+    for objeto in mochila:
+        total += objeto.valor
+    return total
+
+
+def buscarSolucionHeu(objetos: list, capacidad: int):
+    n = len(objetos)
+    mochila= []
+    capacidadRestante = capacidad
+    i = 0
+    
+    # Se realiza el ordenamiento de los objetos segun su indice de mayor a menor
+    ordenarObjHeu(objetos)
+
+    # Mientras haya objetos seguira recorriendo la lista de objetos
+    while(i < n):
+        # Si el objeto actual cabe en la mochila lo guardara en ella
+        if objetos[i].volumen != 0:
+            if (capacidadRestante >= objetos[i].volumen):
+                mochila.append(objetos[i])
+                # Disminuye la capacidad restante de la mochila
+                capacidadRestante -= objetos[i].volumen
+        else:
+            if (capacidadRestante >= objetos[i].peso):
+                mochila.append(objetos[i])
+                # Disminuye la capacidad restante de la mochila
+                capacidadRestante -= objetos[i].peso
+
+        i += 1
+    # Devuelve una lista con los objetos guardados y el valor total de los objetos guardados
+    return [mochila, obtenerTotalHeu(mochila)]
+
+
+
+########################## Funciones sobre excel ##########################
 
 def alinearCelda(celda):
     celda.alignment = Alignment(horizontal='center')
