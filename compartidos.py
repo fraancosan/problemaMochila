@@ -9,10 +9,6 @@ class Objeto:
         self.volumen = volumen
         self.valor = valor
 
-    def __repr__(self) -> str:
-        return f"\nPeso: {self.peso} - Valor: {self.valor}"
-    
-
 
 # Esta funcion tiene la tarea de devolver un booleano que simbolice
 # si la solucion cumple con las restricciones del enunciado.
